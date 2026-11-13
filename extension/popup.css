@@ -1,0 +1,4 @@
+body { width: 290px; padding: 18px; margin: 0; font: 14px system-ui; background: #172033; color: white; }
+h1 { font-size: 20px; margin: 0 0 16px; }
+#calls { background: #26334e; padding: 12px; border-radius: 12px; }
+.hint { color: #bcc7dd; line-height: 1.5; }
