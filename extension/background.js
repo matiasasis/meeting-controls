@@ -49,11 +49,12 @@ function connect() {
   socket.onerror = () => socket.close();
 }
 
-chrome.runtime.onMessage.addListener((message, sender) => {
+chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (message.type !== 'state' || !sender.tab || !sender.url?.startsWith('https://meet.google.com/')) return;
   const state = {active: message.active === true, focused: message.focused === true,
     mic: message.mic, camera: message.camera};
   record(sender.tab.id, state);
+  respond({ok: true});
   connect();
 });
 
