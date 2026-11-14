@@ -68,12 +68,12 @@ Slack desktop supports microphone, camera, and Show call. Meet-only controls rem
 
 Meeting mode is currently available in [draft PR #1](https://github.com/matiasasis/streamdeck-meeting-controls/pull/1). Until it is merged, run `git switch meeting-mode` after cloning to try the profile shown above. The default branch contains the earlier microphone/camera prototype.
 
-
 Requires macOS 12 or later, Xcode Command Line Tools, Node.js 20 or later, Chrome 120 or later, and Stream Deck 6.5 or later. This version recognizes English meeting-control labels.
 
 ```sh
 git clone https://github.com/matiasasis/streamdeck-meeting-controls.git
 cd streamdeck-meeting-controls
+git switch meeting-mode
 npm ci --ignore-scripts
 npm test
 node build.js
