@@ -1,6 +1,6 @@
 import {available, reactions} from './actions.js';
 
-const glyphs = {hand: '✋', share: '↥', captions: 'CC', focus: '▣', status: '●', reactions: '☺', home: '⌂', leave: '☎', meeting: '▦', ...reactions};
+const glyphs = {hand: '✋', share: '↥', captions: 'CC', focus: '▣', status: '●', reactions: '☺', home: '⌂', leave: '☎', ...reactions};
 const labels = {mic: 'MIC', camera: 'CAMERA', thumbsup: 'THUMBS UP', heart: 'HEART', laugh: 'LAUGH', celebrate: 'CELEBRATE', clap: 'CLAP', hand: 'HAND', share: 'SHARE', captions: 'CAPTIONS', focus: 'SHOW CALL', status: 'CALL', reactions: 'REACTIONS', home: 'HOME', leave: 'LEAVE', meeting: 'MEETING'};
 
 export function buttonImage(kind, meeting, busy = false) {
@@ -10,7 +10,7 @@ export function buttonImage(kind, meeting, busy = false) {
     : state === 'on' ? '#087c68' : state === 'off' ? '#b53347' : '#493ed8';
   let glyph;
   if (kind === 'mic') glyph = '<g fill="none" stroke="white" stroke-width="6" stroke-linecap="round"><rect x="58" y="38" width="28" height="44" rx="14"/><path d="M48 65v5a24 24 0 0 0 48 0v-5M72 94v15M59 109h26"/></g>';
-  else if (kind === 'camera') glyph = '<g fill="none" stroke="white" stroke-width="6" stroke-linejoin="round"><rect x="36" y="48" width="52" height="44" rx="8"/><path d="m88 59 22-11v44L88 81z"/></g>';
+  else if (['camera', 'meeting'].includes(kind)) glyph = '<g fill="none" stroke="white" stroke-width="6" stroke-linejoin="round"><rect x="36" y="48" width="52" height="44" rx="8"/><path d="m88 59 22-11v44L88 81z"/></g>';
   else glyph = `<text x="72" y="92" text-anchor="middle" fill="white" font-family="Arial, Apple Color Emoji" font-size="64">${glyphs[kind] ?? '?'}</text>`;
   const slash = state === 'off' && ['mic', 'camera'].includes(kind) ? `<path d="m37 36 70 70" stroke="${color}" stroke-width="13"/><path d="m37 36 70 70" stroke="white" stroke-width="6"/>` : '';
   const label = labels[kind];
