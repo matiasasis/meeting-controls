@@ -13,7 +13,7 @@ This is an early local prototype for macOS. Installation and the Chrome-to-Strea
 - A bundled 15-key profile: install the layout once instead of configuring every button.
 - Free, open source, and local to your Mac.
 
-![Meeting Mode profile with no active call](https://github.com/user-attachments/assets/4b177a3d-5bcd-4eca-9f3c-909653e68ef2)
+![Meeting Mode profile with no active call](https://github.com/user-attachments/assets/8b6bf330-cbbd-4d2e-83f3-8634963bdfbb)
 
 ## Supported controls
 
