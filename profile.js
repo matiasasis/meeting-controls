@@ -5,9 +5,9 @@ import path from 'node:path';
 import {actionNames} from './plugin/actions.js';
 
 export const layout = [
-  ['mic', 'camera', 'hand', 'share', 'captions'],
+  ['home', 'camera', 'hand', 'share', 'captions'],
   ['thumbsup', 'heart', 'laugh', 'celebrate', 'clap'],
-  ['focus', 'status', 'reactions', 'home', 'leave']
+  ['focus', 'status', 'reactions', 'mic', 'leave']
 ];
 
 export function profileActions() {

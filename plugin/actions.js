@@ -3,7 +3,7 @@ export const reactions = {thumbsup: '👍', heart: '❤️', laugh: '😂', cele
 export const actionNames = {
   mic: 'Microphone', camera: 'Camera', hand: 'Raise Hand', share: 'Share Screen', captions: 'Captions',
   thumbsup: 'Thumbs Up', heart: 'Heart', laugh: 'Laugh', celebrate: 'Celebrate', clap: 'Clap',
-  focus: 'Show Call', status: 'Call Status', reactions: 'More Reactions', home: 'Home', leave: 'Hold to Leave',
+  focus: 'Show Call', status: 'Call Status', reactions: 'More Reactions', home: 'Back', leave: 'Hold to Leave',
   meeting: 'Meeting Mode'
 };
 

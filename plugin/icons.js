@@ -1,21 +1,23 @@
 import {available, reactions} from './actions.js';
 
-const glyphs = {hand: '✋', share: '↥', captions: 'CC', focus: '▣', status: '●', reactions: '☺', home: '⌂', leave: '☎', ...reactions};
-const labels = {mic: 'MIC', camera: 'CAMERA', thumbsup: 'THUMBS UP', heart: 'HEART', laugh: 'LAUGH', celebrate: 'CELEBRATE', clap: 'CLAP', hand: 'HAND', share: 'SHARE', captions: 'CAPTIONS', focus: 'SHOW CALL', status: 'CALL', reactions: 'REACTIONS', home: 'HOME', leave: 'LEAVE', meeting: 'MEETING'};
+const glyphs = {hand: '✋', share: '↥', captions: 'CC', focus: '▣', status: '●', reactions: '☺', leave: '☎', ...reactions};
+const labels = {mic: 'MIC', camera: 'CAMERA', thumbsup: 'THUMBS UP', heart: 'HEART', laugh: 'LAUGH', celebrate: 'CELEBRATE', clap: 'CLAP', hand: 'HAND', share: 'SHARE', captions: 'CAPTIONS', focus: 'SHOW CALL', status: 'CALL', reactions: 'REACTIONS', home: 'BACK', leave: 'LEAVE', meeting: 'MEETING'};
 
 export function buttonImage(kind, meeting, busy = false) {
   const state = meeting?.[kind] ?? 'unknown';
   const enabled = available(kind, meeting);
-  const color = busy ? '#a96b11' : !enabled ? '#424754' : kind === 'leave' ? '#b53347'
+  const color = kind === 'meeting' ? '#fbbc04' : kind === 'home' ? '#1769aa' : busy ? '#a96b11' : !enabled ? '#424754' : kind === 'leave' ? '#b53347'
     : state === 'on' ? '#087c68' : state === 'off' ? '#b53347' : '#493ed8';
+  const foreground = kind === 'meeting' ? '#202124' : 'white';
   let glyph;
   if (kind === 'mic') glyph = '<g fill="none" stroke="white" stroke-width="6" stroke-linecap="round"><rect x="58" y="38" width="28" height="44" rx="14"/><path d="M48 65v5a24 24 0 0 0 48 0v-5M72 94v15M59 109h26"/></g>';
   else if (['camera', 'meeting'].includes(kind)) glyph = '<g fill="none" stroke="white" stroke-width="6" stroke-linejoin="round"><rect x="36" y="48" width="52" height="44" rx="8"/><path d="m88 59 22-11v44L88 81z"/></g>';
+  else if (kind === 'home') glyph = '<path d="M110 74H34m28-28L34 74l28 28" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>';
   else glyph = `<text x="72" y="92" text-anchor="middle" fill="white" font-family="Arial, Apple Color Emoji" font-size="64">${glyphs[kind] ?? '?'}</text>`;
   const slash = state === 'off' && ['mic', 'camera'].includes(kind) ? `<path d="m37 36 70 70" stroke="${color}" stroke-width="13"/><path d="m37 36 70 70" stroke="white" stroke-width="6"/>` : '';
   const label = labels[kind];
   const status = busy ? 'WAIT' : ['home', 'meeting'].includes(kind) ? ''
     : kind === 'leave' && meeting ? 'HOLD 0.8s' : meeting?.app.toUpperCase() ?? 'NO CALL';
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144"><rect width="144" height="144" rx="20" fill="${color}"/><text x="72" y="24" fill="white" text-anchor="middle" font-family="Arial" font-size="17" font-weight="bold">${label}</text>${glyph}${slash}<text x="72" y="132" fill="white" text-anchor="middle" font-family="Arial" font-size="14">${status}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="144" height="144"><rect width="144" height="144" rx="20" fill="${color}"/><text x="72" y="24" fill="${foreground}" text-anchor="middle" font-family="Arial" font-size="17" font-weight="bold">${label}</text>${glyph.replaceAll('white', foreground)}${slash}<text x="72" y="132" fill="white" text-anchor="middle" font-family="Arial" font-size="14">${status}</text></svg>`;
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
 }

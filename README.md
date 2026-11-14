@@ -7,20 +7,20 @@ This is an early local prototype for macOS. Installation and the Chrome-to-Strea
 ## Features
 
 - One deck for Google Meet in Chrome and Slack desktop Huddles.
-- Automatic meeting screen, with **Home** and **Meeting Mode** navigation.
+- Automatic meeting screen, with **Back** and **Meeting Mode** navigation.
 - Icons reflect the reported microphone and camera state.
 - Meet hand raising, captions, reactions, screen-sharing picker, and hold-to-leave.
 - A bundled 15-key profile: install the layout once instead of configuring every button.
 - Free, open source, and local to your Mac.
 
-![Meeting Mode profile with no active call](https://github.com/user-attachments/assets/8b6bf330-cbbd-4d2e-83f3-8634963bdfbb)
+![Meeting Mode profile with no active call](https://github.com/user-attachments/assets/28792abb-6388-449b-a617-a3b9baab7bcb)
 
 ## Supported controls
 
 | Control | Google Meet · Chrome | Slack Huddles · desktop |
 |---|---|---|
 | Microphone and camera | Yes | Yes |
-| Automatic meeting profile and Home | Yes | Yes |
+| Automatic meeting profile and Back | Yes | Yes |
 | Show call | Focuses Meet tab | Opens Slack |
 | Raise/lower hand and captions | Yes | Not yet |
 | Emoji reactions | Yes | Not yet |
@@ -52,17 +52,17 @@ The extension is restricted to `meet.google.com`. The macOS helper reads accessi
 
 ## Meeting mode
 
-Joining a detected call opens the meeting profile. **Home** returns to your previous profile and stays there during the call; press **Meeting Mode** to return. Ending the call restores your previous profile if the meeting profile is still visible. A 10-second grace period avoids switching profiles during brief connection interruptions.
+Joining a detected call opens the meeting profile. **Back** returns to your previous profile and stays there during the call; press **Meeting Mode** to return. Ending the call restores your previous profile if the meeting profile is still visible. A 10-second grace period avoids switching profiles during brief connection interruptions.
 
 | Row | Key 1 | Key 2 | Key 3 | Key 4 | Key 5 |
 |---|---|---|---|---|---|
-| Top | Microphone | Camera | Raise/lower hand | Share screen | Captions |
+| Top | Back | Camera | Raise/lower hand | Share screen | Captions |
 | Middle | 👍 | ❤️ | 😂 | 🎉 | 👏 |
-| Bottom | Show call | Call status | Reactions | Home | Hold to leave |
+| Bottom | Show call | Call status | Reactions | Microphone | Hold to leave |
 
 Google Meet supports all controls when its corresponding English buttons are available. Sharing opens Meet’s normal picker; choose what to share there. Hold **Leave** for at least 0.8 seconds, then release. If Meet requests confirmation, finish it in Meet. Emoji buttons send a reaction immediately.
 
-Slack desktop supports microphone, camera, and Show call. Meet-only controls remain disabled for Huddles. Home and Meeting Mode work for either app. The bundled layout targets 15-key Stream Decks; other sizes are not yet supported.
+Slack desktop supports microphone, camera, and Show call. Meet-only controls remain disabled for Huddles. Back and Meeting Mode work for either app. The bundled layout targets 15-key Stream Decks; other sizes are not yet supported.
 
 ## Build from source
 

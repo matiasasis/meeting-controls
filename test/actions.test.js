@@ -31,7 +31,7 @@ test('unsupported Slack controls stay disabled while Home is always available', 
 test('the bundled 15-key layout includes Home and leaves user profiles untouched', () => {
   const actions = profileActions();
   assert.equal(Object.keys(actions).length, 15);
-  assert.equal(actions['3,2'].UUID, 'com.mati.meetingcontrols.home');
+  assert.equal(actions['0,0'].UUID, 'com.mati.meetingcontrols.home');
   assert.equal(actions['4,2'].UUID, 'com.mati.meetingcontrols.leave');
   assert.ok(Object.values(actions).every(action => action.UUID.startsWith('com.mati.meetingcontrols.')));
 });
