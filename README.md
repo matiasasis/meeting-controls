@@ -27,6 +27,16 @@ The extension is restricted to `meet.google.com`. The macOS helper reads accessi
 
 ## Build
 
+Requires macOS 12 or later, Xcode Command Line Tools, Node.js 20 or later, Chrome 120 or later, and Stream Deck 6.5 or later. This version recognizes English meeting-control labels.
+
+```sh
+git clone https://github.com/matiasasis/meeting-controls.git
+cd meeting-controls
+npm ci --ignore-scripts
+npm test
+node build.js
+```
+
 Run `npm ci --ignore-scripts`, `npm test`, and `node build.js`. On a Mac with an SDK/compiler mismatch, set `SWIFT_SDK` to a compatible installed SDK. Test Swift label recognition by compiling `helper/Controls.swift` with `test/ControlsTests.swift`.
 
 ## Local installation
@@ -44,3 +54,13 @@ Build output contains a random local pairing secret shared by the extension and 
 The extension popup shows its connection and the detected Meet mic/camera state. Test toggles in an empty call before relying on them in a meeting. Slack's UI and Meet's labels can change; unrecognized or ambiguous controls disable the button instead of guessing. Huddles controls must remain exposed in Slack's accessibility tree; if a collapsed huddle is not detected, expand its window.
 
 To uninstall, remove the two keys and plugin, remove the Chrome extension, remove the helper from Accessibility, and delete the local source directory and helper app.
+
+## Contributing
+
+Bug reports and pull requests are welcome. Include your macOS, Chrome, Slack, and Stream Deck versions, the meeting app affected, and whether the button showed an incorrect state or failed to toggle. Do not include meeting contents, participant details, or your generated pairing secret.
+
+Run the JavaScript tests and Swift label fixtures before submitting changes. Changes to app detection should include a regression fixture for the relevant control labels.
+
+## License
+
+[MIT](LICENSE). This is an independent project, not affiliated with Google, Slack, or Elgato.
