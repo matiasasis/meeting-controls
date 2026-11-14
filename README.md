@@ -2,6 +2,18 @@
 
 Two Stream Deck keys control Google Meet in Chrome and Slack Huddles in the desktop app. All communication stays on this Mac. There is no account, subscription, cloud service, or collection of meeting audio, video, chat, or participants.
 
+This is an early local prototype for macOS. Installation and the Chrome-to-Stream-Deck connection have been verified. Automated tests cover routing, authentication, state detection, and simulated toggles; physical-key toggles in real Meet calls and Slack Huddles still need end-to-end verification.
+
+## How it works
+
+- **Chrome extension (JavaScript, Manifest V3):** reads Meet's microphone and camera button labels and clicks the requested control, including while the tab is in the background.
+- **Stream Deck plugin (JavaScript on Node.js):** receives physical key presses, selects the last focused meeting, and draws icons from the reported state.
+- **Local WebSocket bridge:** connects the plugin and extension on this Mac, authenticated with a randomly generated pairing secret.
+- **Slack helper (Swift with AppKit and Accessibility):** locates the desktop Huddle controls and presses the requested button, after checking its current state.
+- **Popup (HTML/CSS):** shows the extension connection and detected Meet state.
+
+Node's test runner and jsdom exercise the browser and plugin code. Swift fixtures test Slack label recognition. There is no hosted backend or database.
+
 The extension is restricted to `meet.google.com`. The macOS helper reads accessibility button labels in Slack and presses only the recognized microphone or camera control. English meeting controls are required for this version.
 
 ## Button behavior
