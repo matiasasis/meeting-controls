@@ -14,4 +14,10 @@ export class SlackAdapter {
 
   status() { return this.run('status'); }
   toggle(target, kind) { return this.run('toggle', kind, target[kind]); }
+
+  async perform(target, kind) {
+    if (kind !== 'focus') throw new Error('This control is not supported for Slack');
+    await execute('/usr/bin/open', ['-b', 'com.tinyspeck.slackmacgap']);
+    return this.status();
+  }
 }

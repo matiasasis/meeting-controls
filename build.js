@@ -4,6 +4,8 @@ import {randomBytes} from 'node:crypto';
 import path from 'node:path';
 import os from 'node:os';
 import {buttonImage} from './plugin/icons.js';
+import {actionNames} from './plugin/actions.js';
+import {buildProfile} from './profile.js';
 
 const output = path.resolve('dist');
 const plugin = path.join(output, 'com.mati.meetingcontrols.sdPlugin');
@@ -16,25 +18,29 @@ writeFileSync(tokenPath, token, {mode: 0o600});
 cpSync('extension', path.join(output, 'extension'), {recursive: true});
 writeFileSync(path.join(output, 'extension/config.js'), `export const token = ${JSON.stringify(token)};\n`, {mode: 0o600});
 cpSync('plugin', path.join(plugin, 'plugin'), {recursive: true});
+cpSync('inspector', path.join(plugin, 'inspector'), {recursive: true});
 cpSync('node_modules/ws', path.join(plugin, 'node_modules/ws'), {recursive: true});
 writeFileSync(path.join(plugin, 'package.json'), JSON.stringify({type: 'module'}));
 writeFileSync(path.join(plugin, 'local-config.json'), JSON.stringify({token,
   helper: path.join(os.homedir(), 'Applications/Meeting Controls Helper.app/Contents/MacOS/MeetingControlsHelper')}), {mode: 0o600});
 
 mkdirSync(path.join(plugin, 'images'), {recursive: true});
-for (const kind of ['mic', 'camera']) {
+for (const kind of Object.keys(actionNames)) {
   writeFileSync(path.join(plugin, `images/${kind}.svg`), Buffer.from(buttonImage(kind, null).split(',')[1], 'base64'));
 }
-const actions = ['mic', 'camera'].map(kind => ({UUID: `com.mati.meetingcontrols.${kind}`,
-  Name: kind === 'mic' ? 'Meeting Microphone' : 'Meeting Camera', Icon: `images/${kind}`,
-  Tooltip: 'Toggle the last focused Meet call or Slack Huddle. The icon reports the actual state.',
+const actions = Object.keys(actionNames).map(kind => ({UUID: `com.mati.meetingcontrols.${kind}`,
+  Name: actionNames[kind], Icon: `images/${kind}`,
+  Tooltip: kind === 'leave' ? 'Hold for 0.8 seconds to leave the selected call.' : actionNames[kind],
+  ...(['meeting', 'home'].includes(kind) ? {PropertyInspectorPath: 'inspector/index.html'} : {}),
   Controllers: ['Keypad'], UserTitleEnabled: false, States: [{Image: `images/${kind}`, ShowTitle: false}]}));
 writeFileSync(path.join(plugin, 'manifest.json'), JSON.stringify({Name: 'Local Meeting Controls',
   Author: 'Matias Asis', Description: 'Local microphone and camera controls for Meet and Slack.',
-  Version: '0.1.0.0', UUID: 'com.mati.meetingcontrols', SDKVersion: 2,
+  Version: '0.2.0.0', UUID: 'com.mati.meetingcontrols', SDKVersion: 2,
   CodePath: 'plugin/main.js', Nodejs: {Version: '20'}, Icon: 'images/mic',
   Category: 'Meeting Controls', CategoryIcon: 'images/mic',
-  OS: [{Platform: 'mac', MinimumVersion: '12'}], Software: {MinimumVersion: '6.5'}, Actions: actions}, null, 2));
+  OS: [{Platform: 'mac', MinimumVersion: '12'}], Software: {MinimumVersion: '6.5'}, Actions: actions,
+  Profiles: [{Name: 'profiles/Meeting Mode', DeviceType: 0, AutoInstall: false, DontAutoSwitchWhenInstalled: true, Readonly: false}]}, null, 2));
+buildProfile(plugin);
 
 const sdk = process.env.SWIFT_SDK ?? execFileSync('xcrun', ['--show-sdk-path'], {encoding: 'utf8'}).trim();
 execFileSync('/usr/bin/swiftc', ['-sdk', sdk, '-module-cache-path', '/tmp/meeting-controls-swift-cache',

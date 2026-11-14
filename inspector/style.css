@@ -1,0 +1,6 @@
+body { margin: 16px; color: #eee; background: #252525; font: 13px system-ui; }
+h2 { font-size: 17px; }
+p { line-height: 1.5; color: #bbb; }
+button { border: 0; border-radius: 7px; padding: 10px 14px; margin: 4px 4px 4px 0; background: #493ed8; color: white; font: inherit; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+#home { background: #454545; }

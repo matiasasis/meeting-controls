@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Local Meeting Controls",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Control Google Meet from your own Stream Deck, entirely on this Mac.",
   "minimum_chrome_version": "120",
   "permissions": ["alarms", "scripting"],

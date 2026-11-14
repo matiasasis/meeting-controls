@@ -5,6 +5,7 @@ import {mkdtempSync, cpSync, symlinkSync, writeFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
+import net from 'node:net';
 import {WebSocketServer, WebSocket} from 'ws';
 
 function nextMessage(socket, predicate) {
@@ -27,7 +28,12 @@ test('plugin registers, renders live state, and routes a Stream Deck press to Me
   cpSync('plugin', path.join(directory, 'plugin'), {recursive: true});
   symlinkSync(path.resolve('node_modules'), path.join(directory, 'node_modules'));
   writeFileSync(path.join(directory, 'package.json'), '{"type":"module"}');
-  writeFileSync(path.join(directory, 'local-config.json'), JSON.stringify({token: 'integration-token', helper: '/usr/bin/false'}));
+  const reservation = net.createServer();
+  reservation.listen(0, '127.0.0.1');
+  await once(reservation, 'listening');
+  const bridgePort = reservation.address().port;
+  await new Promise(resolve => reservation.close(resolve));
+  writeFileSync(path.join(directory, 'local-config.json'), JSON.stringify({token: 'integration-token', helper: '/usr/bin/false', bridgePort}));
   const server = new WebSocketServer({port: 0, host: '127.0.0.1'});
   t.after(() => { for (const client of server.clients) client.terminate(); server.close(); });
   await once(server, 'listening');
@@ -41,7 +47,7 @@ test('plugin registers, renders live state, and routes a Stream Deck press to Me
   const firstImage = nextMessage(deck, message => message.event === 'setImage');
   deck.send(JSON.stringify({event: 'willAppear', context: 'key', action: 'com.mati.meetingcontrols.mic'}));
   assert.match((await firstImage).payload.image, /^data:image\/svg\+xml;base64,/);
-  const browser = new WebSocket('ws://127.0.0.1:18765', {origin: `chrome-extension://${'a'.repeat(32)}`});
+  const browser = new WebSocket(`ws://127.0.0.1:${bridgePort}`, {origin: `chrome-extension://${'a'.repeat(32)}`});
   t.after(() => browser.terminate());
   await once(browser, 'open');
   const stateImage = nextMessage(deck, message => message.event === 'setImage');
@@ -58,4 +64,14 @@ test('plugin registers, renders live state, and routes a Stream Deck press to Me
     Buffer.from(event.payload.image.split(',')[1], 'base64').toString().includes('#087c68'));
   browser.send(JSON.stringify({type: 'result', id: message.id, state: {active: true, mic: 'on', camera: 'off'}}));
   await finalImage;
+  const automatic = nextMessage(deck, event => event.event === 'switchToProfile');
+  deck.send(JSON.stringify({event: 'willAppear', device: 'deck', context: 'launcher', action: 'com.mati.meetingcontrols.meeting'}));
+  assert.equal((await automatic).payload.profile, 'profiles/Meeting Mode');
+  deck.send(JSON.stringify({event: 'willAppear', device: 'deck', context: 'homekey', action: 'com.mati.meetingcontrols.home'}));
+  const home = nextMessage(deck, event => event.event === 'switchToProfile');
+  deck.send(JSON.stringify({event: 'sendToPlugin', context: 'launcher', action: 'com.mati.meetingcontrols.meeting', payload: {navigate: 'home'}}));
+  assert.deepEqual((await home).payload, {});
+  const reopen = nextMessage(deck, event => event.event === 'switchToProfile');
+  deck.send(JSON.stringify({event: 'sendToPlugin', context: 'launcher', action: 'com.mati.meetingcontrols.meeting', payload: {navigate: 'meeting'}}));
+  assert.equal((await reopen).device, 'deck');
 });

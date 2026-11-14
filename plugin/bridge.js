@@ -2,6 +2,7 @@ import http from 'node:http';
 import {timingSafeEqual, randomUUID} from 'node:crypto';
 import {EventEmitter} from 'node:events';
 import {WebSocketServer, WebSocket} from 'ws';
+import {actionNames, toggles} from './actions.js';
 
 export class BrowserBridge extends EventEmitter {
   constructor(token, registry) {
@@ -64,7 +65,9 @@ export class BrowserBridge extends EventEmitter {
   receive(message) {
     if (message.type === 'state' && Number.isInteger(message.tabId)) {
       this.registry.update(`meet:${message.tabId}`, {app: 'Meet', active: message.active === true,
-        focused: message.focused === true, mic: this.state(message.mic), camera: this.state(message.camera)});
+        focused: message.focused === true,
+        ...Object.fromEntries(toggles.map(kind => [kind, this.state(message[kind])])),
+        capabilities: Array.isArray(message.capabilities) ? message.capabilities.filter(kind => Object.hasOwn(actionNames, kind)) : []});
     } else if (message.type === 'remove' && Number.isInteger(message.tabId)) {
       this.registry.remove(`meet:${message.tabId}`);
     } else if (message.type === 'result') {
@@ -80,15 +83,23 @@ export class BrowserBridge extends EventEmitter {
   state(value) { return ['on', 'off'].includes(value) ? value : 'unknown'; }
 
   toggle(target, kind) {
+    return this.request(target, {type: 'toggle', kind, expected: target[kind]});
+  }
+
+  perform(target, kind) {
+    return this.request(target, {type: 'perform', kind});
+  }
+
+  request(target, command) {
     if (this.client?.readyState !== WebSocket.OPEN) return Promise.reject(new Error('Browser disconnected'));
     const id = randomUUID();
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => { this.pending.delete(id); reject(new Error('Browser response timed out')); }, 2500);
+      const timeout = setTimeout(() => { this.pending.delete(id); reject(new Error('Browser response timed out')); }, 4000);
       this.pending.set(id, {
         resolve: state => { clearTimeout(timeout); resolve(state); },
         reject: error => { clearTimeout(timeout); reject(error); }
       });
-      this.client.send(JSON.stringify({type: 'toggle', id, tabId: Number(target.id.split(':')[1]), kind, expected: target[kind]}));
+      this.client.send(JSON.stringify({...command, id, tabId: Number(target.id.split(':')[1])}));
     });
   }
 

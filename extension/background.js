@@ -39,8 +39,18 @@ function connect() {
     let message;
     try { message = JSON.parse(event.data); } catch { return; }
     if (message.type === 'ping') { send({type: 'pong'}); return; }
-    if (message.type !== 'toggle' || !Number.isInteger(message.tabId)) return;
+    if (!['toggle', 'perform'].includes(message.type) || !Number.isInteger(message.tabId)) return;
     try {
+      const current = await chrome.tabs.get(message.tabId);
+      if (!current.url?.startsWith('https://meet.google.com/')) throw new Error('Not a Meet tab');
+      if (['focus', 'share', 'reactions', 'leave'].includes(message.kind)) {
+        await chrome.tabs.update(message.tabId, {active: true});
+        await chrome.windows.update(current.windowId, {focused: true});
+      }
+      if (message.kind === 'focus') {
+        send({type: 'result', id: message.id, state: await chrome.tabs.sendMessage(message.tabId, {type: 'read'})});
+        return;
+      }
       const result = await chrome.tabs.sendMessage(message.tabId, message);
       send({type: 'result', id: message.id, ...result});
     } catch { send({type: 'result', id: message.id, error: 'Meet tab is no longer available'}); }
@@ -52,7 +62,7 @@ function connect() {
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
   if (message.type !== 'state' || !sender.tab || !sender.url?.startsWith('https://meet.google.com/')) return;
   const state = {active: message.active === true, focused: message.focused === true,
-    mic: message.mic, camera: message.camera};
+    mic: message.mic, camera: message.camera, hand: message.hand, captions: message.captions, capabilities: message.capabilities};
   record(sender.tab.id, state);
   respond({ok: true});
   connect();
