@@ -17,6 +17,7 @@ test('service worker authenticates, polls background tabs, and returns command r
   const chrome = {
     tabs: {
       query: async () => [{id: 5}],
+      get: async () => ({url: 'https://meet.google.com/test', windowId: 1}),
       sendMessage: async (id, message) => {
         requests.push({id, message});
         return message.type === 'read' ? {active: true, mic: 'off', camera: 'on', focused: false} : {state: {mic: 'on'}};

@@ -3,3 +3,4 @@ dist/
 Backups/
 extension/config.js
 *.log
+node_modules
